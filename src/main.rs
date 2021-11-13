@@ -1,24 +1,15 @@
-use std::path::PathBuf;
-
+use app_state::build_app_state;
 use fltk::{
     app::App,
-    dialog::{FileDialog, FileDialogType},
-    enums::Shortcut,
-    frame::Frame,
-    menu::{MenuBar, MenuFlag},
-    prelude::{GroupExt, MenuExt, WidgetExt},
+    prelude::{GroupExt, WidgetExt},
     window::Window,
 };
+use message::Message;
+use run::run;
 
-#[derive(Debug, Clone, Copy)]
-pub enum Message {
-    SelectDirectory,
-}
-
-struct AppState {
-    dir: PathBuf,
-    label_dir: Frame,
-}
+mod app_state;
+mod message;
+mod run;
 
 fn main() {
     // Build app.
@@ -26,53 +17,19 @@ fn main() {
 
     // Build window.
     let mut window = Window::default()
-        .with_size(400, 400)
+        .with_size(800, 600)
         .with_label("Aban Config");
 
     // Message channel.
     let (sender, receiver) = fltk::app::channel::<Message>();
 
-    // Build UI.
-    MenuBar::default()
-        .with_size(400, 20)
-        .with_label("My Menu")
-        .add_emit(
-            "Open",
-            Shortcut::None,
-            MenuFlag::Normal,
-            sender,
-            Message::SelectDirectory,
-        );
-
-    let label_dir = Frame::default()
-        .with_pos(0, 20)
-        .with_size(400, 20)
-        .with_label("");
+    // Build ui and app state.
+    let state = build_app_state(sender);
 
     // Finish window
     window.end();
     window.show();
 
-    // Build app state
-    let mut state = AppState {
-        dir: PathBuf::new(),
-        label_dir,
-    };
-
-    // Run the app.
-    while app.wait() {
-        if let Some(msg) = receiver.recv() {
-            match msg {
-                Message::SelectDirectory => select_directory(&mut state),
-            }
-        }
-    }
-}
-
-fn select_directory(state: &mut AppState) {
-    let mut fd = FileDialog::new(FileDialogType::BrowseDir);
-    fd.show();
-    state.dir = fd.filename();
-    println!("'{}'", state.dir.to_str().unwrap());
-    state.label_dir.set_label(state.dir.to_str().unwrap());
+    // Run.
+    run(&app, state, receiver);
 }
