@@ -17,6 +17,7 @@ fn main() {
 
     // Build window.
     let mut window = Window::default()
+        // .with_pos(50, 100)
         .with_size(800, 600)
         .with_label("Aban Config");
 

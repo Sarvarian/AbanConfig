@@ -8,4 +8,6 @@ edition = "2021"
 [dependencies]
 fltk = "1.2.15"
 toml = "0.5.8"
+serde = "1.0.130"
+serde_derive = "1.0.130"
 cmake = "0.1.46"
