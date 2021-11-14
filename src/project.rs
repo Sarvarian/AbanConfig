@@ -2,7 +2,7 @@ use serde_derive::Deserialize;
 
 #[derive(Deserialize)]
 pub struct AbanProjectConfig {
-    name: String,
+    pub name: String,
 }
 
 impl Default for AbanProjectConfig {

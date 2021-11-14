@@ -10,6 +10,7 @@ use fltk::{
 use crate::{message::Message, project::AbanProjectConfig, AbanModule};
 
 pub struct AppState {
+    pub is_valid: bool,
     pub path: PathBuf,
     pub reload_dir_error: String,
     pub output: MultilineOutput,
@@ -58,6 +59,7 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
     output.set_wrap(true);
 
     AppState {
+        is_valid: false,
         path: PathBuf::new(),
         reload_dir_error: String::new(),
         output,

@@ -1,21 +1,29 @@
-use std::{
-    fs::{read_dir, read_to_string},
-    path::PathBuf,
-};
+use std::fs::{read_dir, read_to_string};
 
-use crate::module;
 pub use crate::AbanModule;
+use crate::{app_state::AppState, module};
 
-pub fn reload_directory(
-    reload_dir_error: &mut String,
-    path: &PathBuf,
-    modules: &mut Vec<AbanModule>,
-) {
+pub fn reload_directory(state: &mut AppState) {
+    let reload_dir_error = &mut state.reload_dir_error;
+    let path = &state.path;
+    let modules = &mut state.modules;
+
     reload_dir_error.clear();
-    let _ = match read_to_string(path.clone()) {
+
+    let res = match read_to_string(path.clone()) {
         Ok(res) => res,
         Err(err) => {
             reload_dir_error.insert_str(0, format!("Open Failed: {}", err).as_str());
+            return;
+        }
+    };
+    state.project = match toml::from_str(&res) {
+        Ok(res) => res,
+        Err(err) => {
+            reload_dir_error.insert_str(
+                0,
+                format!("Reading project toml file failed: {}", err).as_str(),
+            );
             return;
         }
     };
@@ -40,4 +48,6 @@ pub fn reload_directory(
 
     modules.clear();
     modules.append(&mut aban_modules);
+
+    state.is_valid = true;
 }
