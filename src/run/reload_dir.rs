@@ -1,20 +1,36 @@
-mod config;
+use std::{
+    fs::{read_dir, read_to_string},
+    path::PathBuf,
+};
 
-use std::fs::read_to_string;
+use crate::module;
+pub use crate::AbanModule;
 
-use crate::app_state::AppState;
-
-pub fn reload_directory(state: &mut AppState) {
-    state.reload_dir_error.clear();
-    let _ = match read_to_string(state.path.clone()) {
+pub fn reload_directory(reload_dir_error: &mut String, path: &PathBuf) {
+    reload_dir_error.clear();
+    let _ = match read_to_string(path.clone()) {
         Ok(res) => res,
         Err(err) => {
-            state.reload_dir_error = format!("Open Failed: {}", err);
+            reload_dir_error.insert_str(0, format!("Open Failed: {}", err).as_str());
             return;
         }
     };
 
-    let mut path = state.path.clone();
+    let mut path = path.clone();
     path.pop();
     path.push("src-c");
+
+    let read_dir = match read_dir(path.clone()) {
+        Ok(read_dir) => read_dir,
+        Err(err) => {
+            reload_dir_error.insert_str(0, format!("Open 'src-c' Failed: {}", err).as_str());
+            return;
+        }
+    };
+
+    let mut aban_modules = Vec::<AbanModule>::new();
+
+    for item in read_dir {
+        aban_modules.push(module::load(&item, path.clone()));
+    }
 }

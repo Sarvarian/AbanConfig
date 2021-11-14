@@ -7,12 +7,13 @@ use fltk::{
     prelude::{InputExt, WidgetExt},
 };
 
-use crate::message::Message;
+use crate::{message::Message, AbanModule};
 
 pub struct AppState {
     pub path: PathBuf,
     pub reload_dir_error: String,
     pub output: MultilineOutput,
+    pub modules: Vec<AbanModule>,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -51,5 +52,6 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         path: PathBuf::new(),
         reload_dir_error: String::new(),
         output,
+        modules: Vec::new(),
     }
 }

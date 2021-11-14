@@ -18,9 +18,11 @@ pub fn run(app: &App, mut state: AppState, receiver: Receiver<Message>) {
             match msg {
                 Message::SelectDirectory => {
                     select_directory(&mut state);
-                    reload_directory(&mut state)
+                    reload_directory(&mut state.reload_dir_error, &state.path)
                 }
-                Message::ReloadDirectory => reload_directory(&mut state),
+                Message::ReloadDirectory => {
+                    reload_directory(&mut state.reload_dir_error, &state.path)
+                }
                 Message::Generate => generate(&mut state),
             }
             update_output(&mut state);

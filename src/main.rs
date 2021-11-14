@@ -7,8 +7,13 @@ use fltk::{
 use message::Message;
 use run::run;
 
+pub use module::AbanModule;
+pub use module_config::{AbanModuleConfig, AbanModuleConfigOS};
+
 mod app_state;
 mod message;
+mod module;
+mod module_config;
 mod run;
 
 fn main() {
