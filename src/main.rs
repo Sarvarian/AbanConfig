@@ -11,6 +11,7 @@ pub use module::AbanModule;
 pub use module_config::{AbanModuleConfig, AbanModuleConfigOS};
 
 mod app_state;
+mod check;
 mod message;
 mod module;
 mod module_config;

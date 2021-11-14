@@ -1,29 +1,58 @@
+use std::fs::{create_dir_all, write};
+
 use serde_derive::Serialize;
 use tinytemplate::TinyTemplate;
 
-use crate::app_state::AppState;
-
-#[derive(Serialize)]
-struct Test {}
+use crate::{app_state::AppState, main};
 
 pub fn generate_cmake(state: &AppState) {
     if !state.is_valid {
         return;
     }
-    let context = CMakeListTemplateContext {
-        name: state.project.name.clone(),
-        add_c_modules: "add_subdirectory(src-aban)".to_string(),
-        add_main: "add_subdirectory(src-c)".to_string(),
-        cmake_current_list_dir: "{CMAKE_CURRENT_LIST_DIR}".to_string(),
-    };
+    let mut path = state.path.clone();
+    path.pop();
+    path.push("cmake");
+    let cmake_path_clone = path.clone();
+    let cmake_path = cmake_path_clone.to_str().unwrap();
+    if let Err(err) = create_dir_all(path.clone()) {
+        println!("Error: {}", err);
+    }
+    path.push("CMakeLists.txt");
+
+    let cmake_lists_txt = render(state.config.name.clone());
+    let res = write(path, cmake_lists_txt);
+    if let Err(err) = res {
+        println!("Error: {}", err);
+    }
+
+    let res = std::process::Command::new("cmake")
+        .args(["-S", &cmake_path, "-B", &cmake_path])
+        .output();
+
+    match res {
+        Ok(output) => println!("Output: {:?}", output),
+        Err(err) => println!("Error: {}", err),
+    }
+}
+
+fn render(project_name: String) -> String {
+    let context = build_context(project_name);
     let mut tt = TinyTemplate::new();
     tt.add_template("cmake_list_txt", C_MAKE_LIST_TXT_TEMPLATE)
         .unwrap();
     let rendered = tt.render("cmake_list_txt", &context).unwrap();
-    print!("{}", rendered);
+
+    return rendered;
 }
 
-fn render(project_name: String) -> String {}
+fn build_context(project_name: String) -> CMakeListTemplateContext {
+    CMakeListTemplateContext {
+        name: project_name.clone(),
+        add_c_modules: "add_subdirectory(src-aban)".to_string(),
+        add_main: "add_subdirectory(src-c)".to_string(),
+        cmake_current_list_dir: "{CMAKE_CURRENT_LIST_DIR}".to_string(),
+    }
+}
 
 #[derive(Serialize)]
 struct CMakeListTemplateContext {

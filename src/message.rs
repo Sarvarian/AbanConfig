@@ -4,4 +4,5 @@ pub enum Message {
     ReloadDirectory,
     SourceGenerate,
     CMakeGenerate,
+    Check,
 }

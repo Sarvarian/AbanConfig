@@ -17,7 +17,7 @@ pub fn reload_directory(state: &mut AppState) {
             return;
         }
     };
-    state.project = match toml::from_str(&res) {
+    state.config = match toml::from_str(&res) {
         Ok(res) => res,
         Err(err) => {
             reload_dir_error.insert_str(

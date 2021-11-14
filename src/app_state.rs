@@ -7,15 +7,16 @@ use fltk::{
     prelude::{InputExt, WidgetExt},
 };
 
-use crate::{message::Message, project::AbanProjectConfig, AbanModule};
+use crate::{check::Checks, message::Message, project::AbanProjectConfig, AbanModule};
 
 pub struct AppState {
     pub is_valid: bool,
     pub path: PathBuf,
     pub reload_dir_error: String,
     pub output: MultilineOutput,
-    pub project: AbanProjectConfig,
+    pub config: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
+    pub checks: Checks,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -50,7 +51,9 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
         .with_label("CMake Generate");
     button.emit(sender, Message::CMakeGenerate);
-    // button_pos_y += BUTTON_HEIGHT;
+    button_pos_y += BUTTON_HEIGHT;
+
+    let checks = Checks::new(button_pos_y, BUTTON_WIDTH, BUTTON_HEIGHT, sender.clone());
 
     let mut output = MultilineOutput::default()
         .with_pos(200, 0)
@@ -63,7 +66,8 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         path: PathBuf::new(),
         reload_dir_error: String::new(),
         output,
-        project: AbanProjectConfig::default(),
+        config: AbanProjectConfig::default(),
         modules: Vec::new(),
+        checks,
     }
 }
