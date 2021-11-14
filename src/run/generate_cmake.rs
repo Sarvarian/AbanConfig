@@ -15,7 +15,7 @@ pub fn generate_cmake(state: &mut AppState) {
     path.push("cmake");
     let cmake_path_clone = path.clone();
     if let Err(err) = create_dir_all(path.clone()) {
-        state.gen_cmake_error = format!(
+        state.error_gen_cmake = format!(
             "Failed to create '{}' directory. Error: {}",
             path.to_str().unwrap(),
             err
@@ -27,7 +27,7 @@ pub fn generate_cmake(state: &mut AppState) {
     let cmake_lists_txt = render(state.config.name.clone());
     let res = write(path.clone(), cmake_lists_txt);
     if let Err(err) = res {
-        state.gen_cmake_error = format!(
+        state.error_gen_cmake = format!(
             "Failed to write '{}' directory. Error: {}",
             path.to_str().unwrap(),
             err

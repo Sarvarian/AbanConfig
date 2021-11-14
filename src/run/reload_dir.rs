@@ -4,23 +4,23 @@ pub use crate::AbanModule;
 use crate::{app_state::AppState, module};
 
 pub fn reload_directory(state: &mut AppState) {
-    let reload_dir_error = &mut state.reload_dir_error;
+    let error_reload_dir = &mut state.error_reload_dir;
     let path = &state.path;
     let modules = &mut state.modules;
 
-    reload_dir_error.clear();
+    error_reload_dir.clear();
 
     let res = match read_to_string(path.clone()) {
         Ok(res) => res,
         Err(err) => {
-            reload_dir_error.insert_str(0, format!("Open Failed: {}", err).as_str());
+            error_reload_dir.insert_str(0, format!("Open Failed: {}", err).as_str());
             return;
         }
     };
     state.config = match toml::from_str(&res) {
         Ok(res) => res,
         Err(err) => {
-            reload_dir_error.insert_str(
+            error_reload_dir.insert_str(
                 0,
                 format!("Reading project toml file failed: {}", err).as_str(),
             );
@@ -35,7 +35,7 @@ pub fn reload_directory(state: &mut AppState) {
     let read_dir = match read_dir(path.clone()) {
         Ok(read_dir) => read_dir,
         Err(err) => {
-            reload_dir_error.insert_str(0, format!("Open 'src-c' Failed: {}", err).as_str());
+            error_reload_dir.insert_str(0, format!("Open 'src-c' Failed: {}", err).as_str());
             return;
         }
     };

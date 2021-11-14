@@ -9,8 +9,9 @@ pub fn update_output(state: &mut AppState) {
     string += state.path.to_str().unwrap();
     string += " ;";
     string += "\n";
-    if state.reload_dir_error.as_str() != "" {
-        string += state.reload_dir_error.as_str();
+
+    if state.error_reload_dir.as_str() != "" {
+        string += state.error_reload_dir.as_str();
         string += "\n";
     }
 

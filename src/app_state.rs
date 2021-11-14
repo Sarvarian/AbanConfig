@@ -14,12 +14,12 @@ use crate::{checks::Checks, message::Message, project::AbanProjectConfig, AbanMo
 pub struct AppState {
     pub is_valid: bool,
     pub path: PathBuf,
-    pub reload_dir_error: String,
+    pub error_reload_dir: String,
+    pub error_gen_cmake: String,
     pub output: MultilineOutput,
     pub config: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
     pub checks: Checks,
-    pub gen_cmake_error: String,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -72,11 +72,11 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
     AppState {
         is_valid: false,
         path: PathBuf::new(),
-        reload_dir_error: String::new(),
+        error_reload_dir: String::new(),
+        error_gen_cmake: String::new(),
         output,
         config: AbanProjectConfig::default(),
         modules: Vec::new(),
         checks,
-        gen_cmake_error: String::new(),
     }
 }
