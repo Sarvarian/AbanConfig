@@ -27,8 +27,8 @@ pub fn run(app: &App, mut state: AppState, receiver: Receiver<Message>) {
                 Message::SourceGenerate => generate_source(&state),
                 Message::CMakeGenerate => generate_cmake(&state),
                 Message::Check => (),
-            }
-            update_output(&mut state);
-        }
-    }
-}
+            } // match
+        } // if
+        update_output(&mut state);
+    } // while
+} // run

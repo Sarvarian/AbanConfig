@@ -14,13 +14,9 @@ pub fn update_output(state: &mut AppState) {
         string += "\n";
     }
 
-    // string = string.add("\n\n----- Aban Modules -----\n\n");
-    // for m in state.modules.iter() {
-    //     string = string.add(&add_module_information(m));
-    // }
-    // string = string.add("\n------------------------------\n");
-
-    string += add_module_information(&state.modules).as_str();
+    if state.checks.modules() {
+        string += add_module_information(&state.modules).as_str();
+    }
 
     state.output.set_value(string.as_str());
 }
@@ -90,20 +86,3 @@ fn add_module_information(modules: &Vec<AbanModule>) -> String {
 
     return string;
 }
-
-// fn add_module_information(module: &AbanModule) -> String {
-//     let mut string = String::new();
-//     let validity = match module.is_valid {
-//         true => "(Valid)",
-//         false => "(Not Valid)",
-//     };
-
-//     string =
-//         string.add(format!("Module: {} {}\n", module.path.to_str().unwrap(), validity).as_str());
-
-//     if !module.error.is_empty() {
-//         string = string.add(format!("Error: {}\n\n", module.error).as_str());
-//     }
-
-//     return string;
-// }

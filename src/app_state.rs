@@ -7,7 +7,7 @@ use fltk::{
     prelude::{InputExt, WidgetExt},
 };
 
-use crate::{check::Checks, message::Message, project::AbanProjectConfig, AbanModule};
+use crate::{checks::Checks, message::Message, project::AbanProjectConfig, AbanModule};
 
 pub struct AppState {
     pub is_valid: bool,

@@ -12,7 +12,7 @@ impl Checks {
         let mut browser = CheckBrowser::default();
         browser.set_pos(0, pos_y);
         browser.set_size(width, height);
-        browser.emit(sender, Message::Check);
+        browser.emit(sender, Message::SelectDirectory);
 
         let modules = browser.add("Modules", true);
 
