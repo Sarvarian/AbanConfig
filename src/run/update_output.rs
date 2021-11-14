@@ -20,11 +20,69 @@ pub fn update_output(state: &mut AppState) {
         string += "\n";
     }
 
+    if !state.error_run_cmake.is_empty() {
+        string += state.error_run_cmake.as_str();
+        string += "\n";
+    }
+
     if state.checks.modules() {
         string += add_module_information(&state.modules).as_str();
     }
 
+    if state.checks.cmake() {
+        if let Some(output) = &state.cmake_output {
+            string += add_cmake_output(output).as_str();
+        }
+    }
+
     state.output.set_value(string.as_str());
+}
+
+fn add_cmake_output(output: &std::process::Output) -> String {
+    let mut string = String::new();
+
+    let add_exit_code = || {
+        let mut string = String::new();
+        match output.status.code() {
+            Some(code) => string += format!("Exit Code: {}", code).as_str(),
+            None => string += "Exit Code: None",
+        }
+        string += "\n";
+        return string;
+    };
+
+    let add_stdout = || {
+        let mut string = String::new();
+        match std::str::from_utf8(&output.stdout) {
+            Ok(res) => string += format!("\nSTDOUT:\n{}\n", res).as_str(),
+            Err(err) => {
+                string +=
+                    format!("\nSTDOUT: Failed to interpret result as string: {}\n", err).as_str()
+            }
+        }
+        return string;
+    };
+
+    let add_stderr = || {
+        let mut string = String::new();
+        match std::str::from_utf8(&output.stderr) {
+            Ok(res) => string += format!("\nSTDERR:\n{}\n", res).as_str(),
+            Err(err) => {
+                string +=
+                    format!("\nSTDERR: Failed to interpret result as string: {}\n", err).as_str()
+            }
+        }
+        return string;
+    };
+
+    string += "\n\n----- CMake -----\n\n";
+    string += format!("Success: {}\n", output.status.success()).as_str();
+    string += add_exit_code().as_str();
+    string += add_stdout().as_str();
+    string += add_stderr().as_str();
+    string += "\n-----------------------\n";
+
+    string
 }
 
 fn add_module_information(modules: &Vec<AbanModule>) -> String {

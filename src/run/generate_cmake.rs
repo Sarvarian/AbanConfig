@@ -50,8 +50,8 @@ fn render(project_name: String) -> String {
 fn build_context(project_name: String) -> CMakeListTemplateContext {
     CMakeListTemplateContext {
         name: project_name.clone(),
-        add_c_modules: "add_subdirectory(src-aban)".to_string(),
-        add_main: "add_subdirectory(src-c)".to_string(),
+        add_main: "add_subdirectory(../src-aban src-aban)".to_string(),
+        add_c_modules: "add_subdirectory(../src-c src-c)".to_string(),
         cmake_current_list_dir: "{CMAKE_CURRENT_LIST_DIR}".to_string(),
     }
 }
@@ -82,6 +82,5 @@ else()
 endif()
 
 {add_main}
-{add_c_modules}
-
 "#;
+// {add_c_modules}

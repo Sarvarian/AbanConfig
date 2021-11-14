@@ -3,6 +3,10 @@ use crate::app_state::AppState;
 pub fn run_cmake(state: &mut AppState) {
     state.error_run_cmake.clear();
 
+    if !state.is_valid {
+        return;
+    }
+
     let mut path = state.path.clone();
     path.pop();
     path.push("cmake");
