@@ -47,6 +47,7 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         .with_pos(200, 0)
         .with_size(600, 600);
     output.set_value("Hello!");
+    output.set_wrap(true);
 
     AppState {
         path: PathBuf::new(),

@@ -6,7 +6,11 @@ use std::{
 use crate::module;
 pub use crate::AbanModule;
 
-pub fn reload_directory(reload_dir_error: &mut String, path: &PathBuf) {
+pub fn reload_directory(
+    reload_dir_error: &mut String,
+    path: &PathBuf,
+    modules: &mut Vec<AbanModule>,
+) {
     reload_dir_error.clear();
     let _ = match read_to_string(path.clone()) {
         Ok(res) => res,
@@ -33,4 +37,7 @@ pub fn reload_directory(reload_dir_error: &mut String, path: &PathBuf) {
     for item in read_dir {
         aban_modules.push(module::load(&item, path.clone()));
     }
+
+    modules.clear();
+    modules.append(&mut aban_modules);
 }

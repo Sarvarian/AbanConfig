@@ -6,12 +6,12 @@ use std::{
 use crate::AbanModuleConfig;
 
 pub struct AbanModule {
-    is_valid: bool,
-    path: PathBuf,
-    name: String,
-    error: String,
-    toml: String,
-    config: AbanModuleConfig,
+    pub is_valid: bool,
+    pub path: PathBuf,
+    pub name: String,
+    pub error: String,
+    pub toml: String,
+    pub config: AbanModuleConfig,
 }
 
 pub fn load(item: &Result<DirEntry, std::io::Error>, path: PathBuf) -> AbanModule {
@@ -54,7 +54,6 @@ pub fn load(item: &Result<DirEntry, std::io::Error>, path: PathBuf) -> AbanModul
     }
 
     let mut path = aban_module.path.clone();
-    path.push(item_name.clone());
     path.push("aban.mod.toml");
 
     let res = match read_to_string(path.clone()) {
