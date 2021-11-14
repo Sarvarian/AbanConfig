@@ -16,10 +16,12 @@ pub struct AppState {
     pub path: PathBuf,
     pub error_reload_dir: String,
     pub error_gen_cmake: String,
+    pub error_run_cmake: String,
     pub output: MultilineOutput,
     pub checks: Checks,
     pub config: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
+    pub cmake_output: Option<std::process::Output>,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -45,15 +47,22 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
     let mut button = Button::default()
         .with_pos(button_pos_x, button_pos_y)
         .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
-        .with_label("Source Generate");
-    button.emit(sender, Message::SourceGenerate);
+        .with_label("Generate Source");
+    button.emit(sender, Message::GenerateSource);
     button_pos_y += BUTTON_HEIGHT;
 
     let mut button = Button::default()
         .with_pos(button_pos_x, button_pos_y)
         .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
-        .with_label("CMake Generate");
-    button.emit(sender, Message::CMakeGenerate);
+        .with_label("Generate CMakeLists.txt");
+    button.emit(sender, Message::GenerateCMake);
+    button_pos_y += BUTTON_HEIGHT;
+
+    let mut button = Button::default()
+        .with_pos(button_pos_x, button_pos_y)
+        .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
+        .with_label("CMake");
+    button.emit(sender, Message::CMake);
     button_pos_y += BUTTON_HEIGHT;
 
     let mut check_browser = CheckBrowser::default()
@@ -74,9 +83,11 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         path: PathBuf::new(),
         error_reload_dir: String::new(),
         error_gen_cmake: String::new(),
+        error_run_cmake: String::new(),
         output,
         checks,
         config: AbanProjectConfig::default(),
         modules: Vec::new(),
+        cmake_output: None,
     }
 }

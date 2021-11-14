@@ -6,6 +6,8 @@ use tinytemplate::TinyTemplate;
 use crate::app_state::AppState;
 
 pub fn generate_cmake(state: &mut AppState) {
+    state.error_gen_cmake.clear();
+
     if !state.is_valid {
         return;
     }
@@ -13,7 +15,6 @@ pub fn generate_cmake(state: &mut AppState) {
     let mut path = state.path.clone();
     path.pop();
     path.push("cmake");
-    let cmake_path_clone = path.clone();
     if let Err(err) = create_dir_all(path.clone()) {
         state.error_gen_cmake = format!(
             "Failed to create '{}' directory. Error: {}",
@@ -34,15 +35,6 @@ pub fn generate_cmake(state: &mut AppState) {
         );
         return;
     }
-
-    // let res = std::process::Command::new("cmake")
-    //     .args(["-S", &cmake_path, "-B", &cmake_path])
-    //     .output();
-
-    // match res {
-    //     Ok(output) => println!("Output: {:?}", output),
-    //     Err(err) => println!("Error: {}", err),
-    // }
 }
 
 fn render(project_name: String) -> String {
