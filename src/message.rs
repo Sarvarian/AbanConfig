@@ -2,5 +2,6 @@
 pub enum Message {
     SelectDirectory,
     ReloadDirectory,
-    Generate,
+    SourceGenerate,
+    CMakeGenerate,
 }

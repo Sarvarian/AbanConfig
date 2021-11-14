@@ -7,12 +7,13 @@ use fltk::{
     prelude::{InputExt, WidgetExt},
 };
 
-use crate::{message::Message, AbanModule};
+use crate::{message::Message, project::AbanProjectConfig, AbanModule};
 
 pub struct AppState {
     pub path: PathBuf,
     pub reload_dir_error: String,
     pub output: MultilineOutput,
+    pub project: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
 }
 
@@ -39,8 +40,15 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
     let mut button = Button::default()
         .with_pos(button_pos_x, button_pos_y)
         .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
-        .with_label("Generate");
-    button.emit(sender, Message::Generate);
+        .with_label("Source Generate");
+    button.emit(sender, Message::SourceGenerate);
+    button_pos_y += BUTTON_HEIGHT;
+
+    let mut button = Button::default()
+        .with_pos(button_pos_x, button_pos_y)
+        .with_size(BUTTON_WIDTH, BUTTON_HEIGHT)
+        .with_label("CMake Generate");
+    button.emit(sender, Message::CMakeGenerate);
     // button_pos_y += BUTTON_HEIGHT;
 
     let mut output = MultilineOutput::default()
@@ -53,6 +61,7 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         path: PathBuf::new(),
         reload_dir_error: String::new(),
         output,
+        project: AbanProjectConfig::default(),
         modules: Vec::new(),
     }
 }

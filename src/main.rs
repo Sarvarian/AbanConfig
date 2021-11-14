@@ -14,6 +14,7 @@ mod app_state;
 mod message;
 mod module;
 mod module_config;
+mod project;
 mod run;
 
 fn main() {
