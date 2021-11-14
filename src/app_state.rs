@@ -17,9 +17,9 @@ pub struct AppState {
     pub error_reload_dir: String,
     pub error_gen_cmake: String,
     pub output: MultilineOutput,
+    pub checks: Checks,
     pub config: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
-    pub checks: Checks,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -75,8 +75,8 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         error_reload_dir: String::new(),
         error_gen_cmake: String::new(),
         output,
+        checks,
         config: AbanProjectConfig::default(),
         modules: Vec::new(),
-        checks,
     }
 }

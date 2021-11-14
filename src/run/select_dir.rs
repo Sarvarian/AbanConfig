@@ -5,6 +5,7 @@ use crate::app_state::AppState;
 pub fn select_directory(state: &mut AppState) {
     let mut fd = FileDialog::new(FileDialogType::BrowseFile);
     fd.set_filter("aban.toml");
+    fd.set_preset_file("aban.toml");
     fd.show();
     if fd.filename().to_str().unwrap() == "" {
         return;

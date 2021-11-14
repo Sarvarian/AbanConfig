@@ -10,8 +10,13 @@ pub fn update_output(state: &mut AppState) {
     string += " ;";
     string += "\n";
 
-    if state.error_reload_dir.as_str() != "" {
+    if !state.error_reload_dir.is_empty() {
         string += state.error_reload_dir.as_str();
+        string += "\n";
+    }
+
+    if !state.error_gen_cmake.is_empty() {
+        string += state.error_gen_cmake.as_str();
         string += "\n";
     }
 
