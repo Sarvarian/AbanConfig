@@ -3,36 +3,46 @@ use std::fs::{create_dir_all, write};
 use serde_derive::Serialize;
 use tinytemplate::TinyTemplate;
 
-use crate::{app_state::AppState, main};
+use crate::app_state::AppState;
 
-pub fn generate_cmake(state: &AppState) {
+pub fn generate_cmake(state: &mut AppState) {
     if !state.is_valid {
         return;
     }
+
     let mut path = state.path.clone();
     path.pop();
     path.push("cmake");
     let cmake_path_clone = path.clone();
-    let cmake_path = cmake_path_clone.to_str().unwrap();
     if let Err(err) = create_dir_all(path.clone()) {
-        println!("Error: {}", err);
+        state.gen_cmake_error = format!(
+            "Failed to create '{}' directory. Error: {}",
+            path.to_str().unwrap(),
+            err
+        );
+        return;
     }
     path.push("CMakeLists.txt");
 
     let cmake_lists_txt = render(state.config.name.clone());
-    let res = write(path, cmake_lists_txt);
+    let res = write(path.clone(), cmake_lists_txt);
     if let Err(err) = res {
-        println!("Error: {}", err);
+        state.gen_cmake_error = format!(
+            "Failed to write '{}' directory. Error: {}",
+            path.to_str().unwrap(),
+            err
+        );
+        return;
     }
 
-    let res = std::process::Command::new("cmake")
-        .args(["-S", &cmake_path, "-B", &cmake_path])
-        .output();
+    // let res = std::process::Command::new("cmake")
+    //     .args(["-S", &cmake_path, "-B", &cmake_path])
+    //     .output();
 
-    match res {
-        Ok(output) => println!("Output: {:?}", output),
-        Err(err) => println!("Error: {}", err),
-    }
+    // match res {
+    //     Ok(output) => println!("Output: {:?}", output),
+    //     Err(err) => println!("Error: {}", err),
+    // }
 }
 
 fn render(project_name: String) -> String {

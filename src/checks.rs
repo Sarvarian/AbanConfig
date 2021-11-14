@@ -8,12 +8,7 @@ pub struct Checks {
 }
 
 impl Checks {
-    pub fn new(pos_y: i32, width: i32, height: i32, sender: Sender<Message>) -> Self {
-        let mut browser = CheckBrowser::default();
-        browser.set_pos(0, pos_y);
-        browser.set_size(width, height);
-        browser.emit(sender, Message::SelectDirectory);
-
+    pub fn new(mut browser: CheckBrowser) -> Self {
         let modules = browser.add("Modules", true);
 
         Self { browser, modules }

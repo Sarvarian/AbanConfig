@@ -25,10 +25,10 @@ pub fn run(app: &App, mut state: AppState, receiver: Receiver<Message>) {
                     reload_directory(&mut state);
                 }
                 Message::SourceGenerate => generate_source(&state),
-                Message::CMakeGenerate => generate_cmake(&state),
+                Message::CMakeGenerate => generate_cmake(&mut state),
                 Message::Check => (),
             } // match
+            update_output(&mut state);
         } // if
-        update_output(&mut state);
     } // while
 } // run

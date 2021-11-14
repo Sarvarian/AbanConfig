@@ -2,7 +2,9 @@ use std::path::PathBuf;
 
 use fltk::{
     app::Sender,
+    browser::CheckBrowser,
     button::Button,
+    enums::CallbackTrigger,
     output::MultilineOutput,
     prelude::{InputExt, WidgetExt},
 };
@@ -17,6 +19,7 @@ pub struct AppState {
     pub config: AbanProjectConfig,
     pub modules: Vec<AbanModule>,
     pub checks: Checks,
+    pub gen_cmake_error: String,
 }
 
 pub fn build_app_state(sender: Sender<Message>) -> AppState {
@@ -53,7 +56,12 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
     button.emit(sender, Message::CMakeGenerate);
     button_pos_y += BUTTON_HEIGHT;
 
-    let checks = Checks::new(button_pos_y, BUTTON_WIDTH, BUTTON_HEIGHT, sender.clone());
+    let mut check_browser = CheckBrowser::default()
+        .with_pos(0, button_pos_y)
+        .with_size(BUTTON_WIDTH, BUTTON_HEIGHT);
+    check_browser.emit(sender, Message::Check);
+    check_browser.set_trigger(CallbackTrigger::Changed);
+    let checks = Checks::new(check_browser);
 
     let mut output = MultilineOutput::default()
         .with_pos(200, 0)
@@ -69,5 +77,6 @@ pub fn build_app_state(sender: Sender<Message>) -> AppState {
         config: AbanProjectConfig::default(),
         modules: Vec::new(),
         checks,
+        gen_cmake_error: String::new(),
     }
 }
