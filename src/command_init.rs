@@ -60,13 +60,22 @@ pub fn init_dir(path: PathBuf) {
 fn init_create_file(path: &PathBuf, name: &str, contents: String) {
     let mut path = path.clone();
     path.push(name);
-    write(path, contents).expect(format!("Failed to create '{}'", name).as_str());
+    if path.is_file() {
+        println!(
+            "Creating file '{}' skipped because such file already exists.",
+            name
+        );
+    } else {
+        write(path, contents).expect(format!("Failed to create '{}'", name).as_str());
+        println!("File '{}' created.", name);
+    }
 }
 
 fn init_create_dir(path: &PathBuf, name: &str) {
     let mut path = path.clone();
     path.push(name);
     create_dir_all(path).expect(format!("Failed to create '{}'", name).as_str());
+    println!("Directory '{}' created.", name);
 }
 
 // g
