@@ -50,7 +50,11 @@ pub fn init_dir(path: PathBuf) {
     );
 
     // Create cmake templates.
-    todo!("Create cmake template");
+    init_create_file(
+        &path,
+        format!("{}/{}", DIR_TEMPLATES, FILE_CMAKE_TEMPLATE).as_str(),
+        C_MAKE_LIST_TXT_TEMPLATE.into(),
+    );
 }
 
 fn init_create_file(path: &PathBuf, name: &str, contents: String) {

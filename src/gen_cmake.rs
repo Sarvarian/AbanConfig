@@ -11,7 +11,7 @@ pub fn gen_cmake(_options: GenCMakeOptions) {
     create_dir_all(path).expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
 
     // Read cmake template file.
-    let path = PathBuf::from(FILE_CMAKE_TEMPLATE);
+    let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_CMAKE_TEMPLATE));
     let template =
         read_to_string(path).expect(format!("Failed to open '{}'.", FILE_CMAKE_TEMPLATE).as_str());
 }
