@@ -1,43 +1,21 @@
-use app_state::build_app_state;
-use fltk::{
-    app::App,
-    prelude::{GroupExt, WidgetExt},
-    window::Window,
-};
-use message::Message;
-use run::run;
+use appinput::AppInput;
+use structopt::StructOpt;
 
-pub use module::AbanModule;
-pub use module_config::{AbanModuleConfig, AbanModuleConfigOS};
-
-mod app_state;
-mod checks;
-mod message;
-mod module;
-mod module_config;
-mod project;
-mod run;
+mod appinput;
+mod command_gen;
+mod command_init;
+mod command_new;
+mod constants;
+mod gen_cmake;
+mod gen_ps1;
+mod gen_src;
 
 fn main() {
-    // Build app.
-    let app = App::default();
+    let app_in = AppInput::from_args();
 
-    // Build window.
-    let mut window = Window::default()
-        // .with_pos(50, 100)
-        .with_size(800, 600)
-        .with_label("Aban Config");
-
-    // Message channel.
-    let (sender, receiver) = fltk::app::channel::<Message>();
-
-    // Build ui and app state.
-    let state = build_app_state(sender);
-
-    // Finish window
-    window.end();
-    window.show();
-
-    // Run.
-    run(&app, state, receiver);
+    match app_in {
+        AppInput::Gen(option) => command_gen::gen(option),
+        AppInput::New(options) => command_new::new(options),
+        AppInput::Init(options) => command_init::init(options),
+    }
 }

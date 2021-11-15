@@ -1,8 +1,10 @@
 {
     "cSpell.words": [
         "Aban",
+        "appinput",
         "cmake",
         "fltk",
+        "structopt",
         "tinytemplate"
     ]
 }

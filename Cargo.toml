@@ -6,9 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-fltk = "1.2.15"
+structopt = "0.3.25"
 toml = "0.5.8"
 serde = "1.0.130"
 serde_derive = "1.0.130"
 tinytemplate = "1.2.1"
-cmake = "0.1.46"
