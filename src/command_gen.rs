@@ -3,6 +3,8 @@ use std::{
     path::PathBuf,
 };
 
+use serde::Deserialize;
+
 use crate::{appinput::GenOptions, constants::*};
 
 pub fn gen(_options: GenOptions) {
@@ -20,4 +22,33 @@ pub fn gen(_options: GenOptions) {
         .expect(format!("Failed to read '{}'", FILE_CONFIG_ABAN).as_str());
 
     // Create config structure from aban_toml.
+    let aban_config: AbanConfig = toml::from_str(&aban_toml).expect(
+        format!(
+            "Failed to deserialize '{}' as an AbanConfig",
+            FILE_CONFIG_ABAN
+        )
+        .as_str(),
+    );
+}
+
+struct Aban {
+    config: AbanConfig,
+    modules: Vec<AbanModuleConfig>,
+}
+
+#[derive(Deserialize)]
+struct AbanConfig {
+    name: String,
+}
+
+#[derive(Deserialize)]
+struct AbanModuleConfig {
+    name: String,
+    os: AbanOSConfig,
+}
+
+#[derive(Deserialize)]
+struct AbanOSConfig {
+    init: bool,
+    exit: bool,
 }
