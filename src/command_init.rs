@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use crate::{appinput::InitOptions, constants::*};
+use crate::{appinput::InitOptions, constants::*, template_cmake::*};
 
 pub fn init(_options: InitOptions) {
     init_dir("./".into());
