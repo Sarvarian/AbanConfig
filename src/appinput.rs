@@ -18,13 +18,9 @@ pub enum AppInput {
 #[derive(Debug, StructOpt)]
 #[structopt(
     name = "Code Generator",
-    about = "Generate code and other type of files. (See help)"
+    about = "Generate CMakeLists.txt and other source files."
 )]
-pub enum GenOptions {
-    Src(GenSrcOptions),
-    CMake(GenCMakeOptions),
-    PS1(GenPS1Options),
-}
+pub struct GenOptions {}
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "New Aban Project", about = "Generate new Aban project.")]
@@ -38,29 +34,6 @@ pub struct NewOptions {
     about = "Initialize current directory for an aban project."
 )]
 pub struct InitOptions {}
-
-// ----- Gen Subcommands -----
-
-#[derive(Debug, StructOpt)]
-#[structopt(
-    name = "Generate Source Files",
-    about = "Generate Source File based on modules toml files."
-)]
-pub struct GenSrcOptions {}
-
-#[derive(Debug, StructOpt)]
-#[structopt(
-    name = "Generate CMake File",
-    about = "Generate CMake file based on aban-templates/CMakeList.txt file."
-)]
-pub struct GenCMakeOptions {}
-
-#[derive(Debug, StructOpt)]
-#[structopt(
-    name = "Generate Powershell Script",
-    about = "Generate Powershell script to run cmake and build."
-)]
-pub struct GenPS1Options {}
 
 // g
 // g
