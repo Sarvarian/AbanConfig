@@ -52,7 +52,7 @@ pub fn init_dir(path: PathBuf) {
     // Create cmake templates.
     init_create_file(
         &path,
-        format!("{}/{}", DIR_TEMPLATES, FILE_CMAKE_TEMPLATE).as_str(),
+        format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE).as_str(),
         C_MAKE_LIST_TXT_TEMPLATE.into(),
     );
 }

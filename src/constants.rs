@@ -12,7 +12,7 @@ pub const DIR_SRC_RUST: &str = "src-rs";
 // Files
 
 pub const FILE_CONFIG_ABAN: &str = "aban.toml";
-pub const FILE_CMAKE_TEMPLATE: &str = "CMakeLists.txt";
+pub const FILE_TEMPLATE_CMAKE: &str = "CMakeLists.txt";
 
 // Templates
 
