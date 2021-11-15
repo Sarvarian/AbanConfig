@@ -18,4 +18,6 @@ fn main() {
         AppInput::New(options) => command_new::new(options),
         AppInput::Init(options) => command_init::init(options),
     }
+
+    println!("Aban Config Done.");
 }
