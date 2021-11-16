@@ -103,7 +103,11 @@ impl AbanModule {
             return None;
         }
 
-        let string = match read_to_string(dir_entry.path()) {
+        let string = match read_to_string((|| {
+            let mut path = dir_entry.path();
+            path.push(FILE_CONFIG_MODULE_ABAN);
+            return path;
+        })()) {
             Ok(res) => res,
             Err(err) => {
                 println!(
