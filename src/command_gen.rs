@@ -13,7 +13,6 @@ pub fn gen(_options: GenOptions) {
     create_dir_all(path).expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
 
     // Gather C modules information.
-
     let aban = Aban::new();
 
     // Read cmake template file.
@@ -76,11 +75,31 @@ impl AbanModule {
             return None;
         }
 
-        // config = ;
+        let string = match read_to_string(dir_entry.path()) {
+            Ok(res) => res,
+            Err(err) => {
+                println!(
+                    "'{:?}' Failed to read to string. Error: {}",
+                    dir_entry.path(),
+                    err
+                );
+                return None;
+            }
+        };
 
-        // Some(Self { config })
+        let config = match toml::from_str(&string) {
+            Ok(res) => res,
+            Err(err) => {
+                println!(
+                    "'{:?}' Failed to deserialize to toml. Error: {}",
+                    dir_entry.path(),
+                    err
+                );
+                return None;
+            }
+        };
 
-        None
+        Some(Self { config })
     }
 }
 
