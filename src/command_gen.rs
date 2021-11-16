@@ -15,6 +15,29 @@ pub fn gen(_options: GenOptions) {
     // Gather C modules information.
     let aban = Aban::new();
 
+    // Generate C OS Code.
+    // For each module, if it has init and/or exit on true, add it to the init and/or exit list.
+    // So we have two list. init list and exit list.
+    // Check each module for init and exit and add them to the list if it was true.
+    // Then generate code base on init and exit list.
+    let (init_list, exit_list) = aban.modules.iter().fold(
+        (
+            Vec::with_capacity(aban.modules.len()),
+            Vec::with_capacity(aban.modules.len()),
+        ),
+        |(mut v_init, mut v_exit), m| {
+            if let Some(os) = &m.config.os {
+                if os.init {
+                    v_init.push(m.name.clone());
+                }
+                if os.exit {
+                    v_exit.push(m.name.clone());
+                }
+            }
+            (v_init, v_exit)
+        },
+    );
+
     // Read cmake template file.
     let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE));
     let template =
@@ -64,6 +87,7 @@ struct AbanConfig {
 
 // ----- Aban Module -----
 struct AbanModule {
+    name: String,
     config: AbanModuleConfig,
 }
 
@@ -99,7 +123,10 @@ impl AbanModule {
             }
         };
 
-        Some(Self { config })
+        Some(Self {
+            name: todo!(),
+            config,
+        })
     }
 }
 
