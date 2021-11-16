@@ -38,6 +38,10 @@ pub fn gen(_options: GenOptions) {
         },
     );
 
+    let lists = [init_list, exit_list];
+
+    for i in lists {}
+
     // Read cmake template file.
     let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE));
     let template =
