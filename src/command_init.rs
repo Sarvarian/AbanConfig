@@ -12,16 +12,20 @@ pub fn init(_options: InitOptions) {
 
 pub fn init_dir(path: PathBuf) {
     // Get last directory name.
-    let name = {
-        let path = path.clone();
-        match path.file_name() {
-            Some(name) => name.to_owned(),
-            None => current_dir()
-                .expect("Failed to get current directory.")
-                .file_name()
-                .expect("Failed to get file_name from current_dir.")
-                .to_owned(),
-        }
+    let name_dir_project = || {
+        path.clone()
+            .file_name()
+            .map(|o| o.to_owned())
+            .unwrap_or_else(|| {
+                current_dir()
+                    .expect("Failed to get current directory.")
+                    .file_name()
+                    .expect("Failed to get file_name from current_dir.")
+                    .to_owned()
+            })
+            .to_str()
+            .unwrap()
+            .to_string()
     };
 
     // Create aban directory.
@@ -46,7 +50,7 @@ pub fn init_dir(path: PathBuf) {
     init_create_file(
         &path,
         FILE_CONFIG_ABAN,
-        format!("name = \"{}\"", name.to_str().unwrap()),
+        format!("name = \"{}\"", name_dir_project()),
     );
 
     // Create cmake templates.
