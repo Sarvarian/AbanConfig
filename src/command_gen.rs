@@ -103,14 +103,14 @@ impl AbanModule {
             return None;
         }
 
-        let string = match read_to_string((|| {
+        let string_toml = match read_to_string((|| {
             let mut path = dir_entry.path();
             path.push(FILE_CONFIG_MODULE_ABAN);
             return path;
         })()) {
             Ok(res) => res,
             Err(err) => {
-                println!(
+                eprintln!(
                     "'{:?}' Failed to read to string. Error: {}",
                     dir_entry.path(),
                     err
@@ -119,10 +119,10 @@ impl AbanModule {
             }
         };
 
-        let config = match toml::from_str(&string) {
+        let config = match toml::from_str(&string_toml) {
             Ok(res) => res,
             Err(err) => {
-                println!(
+                eprintln!(
                     "'{:?}' Failed to deserialize to toml. Error: {}",
                     dir_entry.path(),
                     err
@@ -131,10 +131,18 @@ impl AbanModule {
             }
         };
 
-        Some(Self {
-            name: todo!(),
-            config,
-        })
+        let name = match dir_entry.file_name().to_str() {
+            Some(res) => res.to_string(),
+            None => {
+                eprintln!(
+                    "'{:?}' Failed to get file (aka directory) name.",
+                    dir_entry.path(),
+                );
+                return None;
+            }
+        };
+
+        Some(Self { name, config })
     }
 }
 
