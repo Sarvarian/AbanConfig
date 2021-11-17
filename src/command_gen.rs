@@ -3,7 +3,7 @@ use std::{
     path::PathBuf,
 };
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{appinput::GenOptions, constants::*};
 
@@ -18,7 +18,7 @@ pub fn gen(options: GenOptions) {
     // So we have two list. init list and exit list.
     // Check each module for init and exit and add them to the list if it was true.
     // Then generate code base on init and exit list.
-    let (init_list, exit_list) = aban.modules.iter().fold(
+    let (list_init, list_exit) = aban.modules.iter().fold(
         (
             Vec::with_capacity(aban.modules.len()),
             Vec::with_capacity(aban.modules.len()),
@@ -36,23 +36,39 @@ pub fn gen(options: GenOptions) {
         },
     );
 
-    let template_os = {
-        let mut path = start_path.clone();
-        path.push(DIR_TEMPLATES);
-        path.push(FILE_TEMPLATE_OS);
-        read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str())
+    let string_module_init = {
+        let template_os_init = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_INIT);
+        let mut hb = handlebars::Handlebars::new();
+        hb.register_template_string("os_init", template_os_init)
+            .expect("Failed to register os init template in Handlebars.");
+        let mut string_module_init = String::new();
+        for module_name in list_init {
+            let data = ModuleTemplateData { module_name };
+            string_module_init += &hb
+                .render("os_init", &data)
+                .expect("Failed to render os init template with Handlebars.");
+        }
+        string_module_init
     };
+    println!("{}", string_module_init);
 
-    // add_
+    let template_os_exit = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_EXIT);
+
+    let template_os = load_template(&start_path, FILE_TEMPLATE_OS);
+
+    // Read cmake template file.
+    let template_cmake = load_template(&start_path, FILE_TEMPLATE_CMAKE);
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
         .expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
+}
 
-    // Read cmake template file.
-    let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE));
-    let template =
-        read_to_string(path).expect(format!("Failed to open '{}'.", FILE_TEMPLATE_CMAKE).as_str());
+fn load_template(start_path: &PathBuf, file_name: &str) -> String {
+    let mut path = start_path.clone();
+    path.push(DIR_TEMPLATES);
+    path.push(file_name);
+    read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str())
 }
 
 // ----- Aban -----
@@ -112,19 +128,15 @@ impl AbanModule {
             return None;
         }
 
-        let string_toml = match read_to_string((|| {
+        let string_toml = {
             let mut path = dir_entry.path();
             path.push(FILE_CONFIG_MODULE_ABAN);
-            return path;
-        })()) {
-            Ok(res) => res,
-            Err(err) => {
-                eprintln!(
-                    "'{:?}' Failed to read to string. Error: {}",
-                    dir_entry.path(),
-                    err
-                );
-                return None;
+            match read_to_string(path.clone()) {
+                Ok(res) => res,
+                Err(err) => {
+                    eprintln!("'{:?}' Failed to read to string. Error: {}", path, err);
+                    return None;
+                }
             }
         };
 
@@ -176,4 +188,9 @@ struct OSConfig {
 struct HandlebarsPartOfThisApp {
     add_modules_init: String,
     add_modules_exit: String,
+}
+
+#[derive(Serialize)]
+struct ModuleTemplateData {
+    module_name: String,
 }

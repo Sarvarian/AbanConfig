@@ -33,14 +33,14 @@ char* get_error_module_name()
 "#;
 
 pub const TEMPLATE_OS_ADD_MODULE_INIT: &str = r#"
-    err = {{name}}_init(argc, argv);
+    err = {{module_name}}_init(argc, argv);
     if (err != 0)
     {
-        os_process_modules_error_module_name = {{name}};
+        os_process_modules_error_module_name = {{module_name}};
         return err;
     }
 "#;
 
 pub const TEMPLATE_OS_ADD_MODULE_EXIT: &str = r#"
-    {{name}}_init(argc, argv);
+    {{module_name}}_init(argc, argv);
 "#;

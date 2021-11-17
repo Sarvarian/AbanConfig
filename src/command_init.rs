@@ -62,14 +62,14 @@ pub fn init_dir(path: PathBuf) {
     // Create os add module init templates.
     create_template_file(
         &path,
-        FILE_TEMPLATE_OS_MODULE_INIT,
+        FILE_TEMPLATE_OS_ADD_MODULE_INIT,
         TEMPLATE_OS_ADD_MODULE_INIT,
     );
 
     // Create os add module exit templates.
     create_template_file(
         &path,
-        FILE_TEMPLATE_OS_MODULE_EXIT,
+        FILE_TEMPLATE_OS_ADD_MODULE_EXIT,
         TEMPLATE_OS_ADD_MODULE_EXIT,
     );
 }
