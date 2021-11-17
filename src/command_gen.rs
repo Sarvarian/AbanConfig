@@ -5,7 +5,7 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 
-use crate::{appinput::GenOptions, constants::*, template_os::TEMPLATE_OS_PROCESS_MODULES_H};
+use crate::{appinput::GenOptions, constants::*};
 
 pub fn gen(options: GenOptions) {
     let start_path = options.start_path.unwrap_or("./".into());
@@ -39,10 +39,10 @@ pub fn gen(options: GenOptions) {
         |(mut v_init, mut v_exit), m| {
             if let Some(os) = &m.config.os {
                 if os.init {
-                    v_init.push(m.name.clone());
+                    v_init.push(m.name.as_str());
                 }
                 if os.exit {
-                    v_exit.push(m.name.clone());
+                    v_exit.push(m.name.as_str());
                 }
             }
             (v_init, v_exit)
@@ -75,15 +75,27 @@ pub fn gen(options: GenOptions) {
         add_modules_exits,
     };
 
+    // Render os_process.h.
     let file_os_process_contents = handlebars_registry
         .render(templates.os.name, &os_template_data)
         .expect(format!("Failed to render '{}' with Handlebars.", templates.os.name).as_str());
 
+    // Write os_process.h.
     let mut path = start_path.clone();
     path.push(DIR_SRC_MAIN_PRIVATE);
     create_dir_all(&path).expect(format!("Failed to create '{:?}' directory.", path).as_str());
     path.push(FILE_OS_PROCESS);
     write(&path, file_os_process_contents).expect(format!("Failed to write '{:?}'", path).as_str());
+
+    // Gather data for cmake template.
+    let project_name = aban.config.name.as_str();
+    let add_main = format!("add_subdirectory(../{0} {0})", DIR_SRC_MAIN);
+    let add_modules = "".to_string();
+    CMakeTemplateData {
+        project_name,
+        add_main,
+        add_modules,
+    };
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
@@ -177,7 +189,7 @@ impl Aban {
 // ----- Aban Config -----
 #[derive(Deserialize)]
 struct AbanConfig {
-    pub name: String,
+    name: String,
 }
 
 // ----- Aban Module -----
@@ -240,14 +252,14 @@ impl AbanModule {
 // ----- Aban Module Config -----
 #[derive(Deserialize)]
 struct AbanModuleConfig {
-    pub os: Option<OSConfig>,
+    os: Option<OSConfig>,
 }
 
 // ----- Aban Module OS Config
 #[derive(Deserialize)]
 struct OSConfig {
-    pub init: bool,
-    pub exit: bool,
+    init: bool,
+    exit: bool,
 }
 
 // ----- Handlebars -----
@@ -258,8 +270,14 @@ struct OSTemplateData {
 }
 
 #[derive(Serialize)]
-struct ModuleTemplateData {
-    module_name: String,
+struct ModuleTemplateData<'a> {
+    module_name: &'a str,
+}
+
+struct CMakeTemplateData<'a> {
+    project_name: &'a str,
+    add_main: String,
+    add_modules: String,
 }
 
 // g
