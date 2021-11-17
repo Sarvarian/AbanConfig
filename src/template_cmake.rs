@@ -16,10 +16,7 @@ add_executable({{project_name}} "")
 endif()
 
 {{add_main}}
-# add_directory(../src-aban src-aban)
 
 {{add_modules}}
-# add_directory(../src-c/gl src-c/gl)
-# add_directory(../src-c/input src/input)
 
 "#;
