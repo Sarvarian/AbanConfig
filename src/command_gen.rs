@@ -35,12 +35,15 @@ pub fn gen(options: GenOptions) {
             (v_init, v_exit)
         },
     );
-    let template = {
+
+    let template_os = {
         let mut path = start_path.clone();
         path.push(DIR_TEMPLATES);
         path.push(FILE_TEMPLATE_OS);
         read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str())
     };
+
+    // add_
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
@@ -147,6 +150,10 @@ impl AbanModule {
                 return None;
             }
         };
+        if name.len() > 250 {
+            eprintln!("'{:?}' Module name is more then 250 character. Make it shorter or increase the limit.", dir_entry.path());
+            return None;
+        }
 
         Some(Self { name, config })
     }

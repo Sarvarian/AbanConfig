@@ -9,3 +9,5 @@ pub const FILE_CONFIG_ABAN: &str = "aban.toml";
 pub const FILE_CONFIG_MODULE_ABAN: &str = "aban.module.toml";
 pub const FILE_TEMPLATE_CMAKE: &str = "CMakeLists.txt";
 pub const FILE_TEMPLATE_OS: &str = "os_process_modules.h";
+pub const FILE_TEMPLATE_OS_MODULE_INIT: &str = "os_process_modules.h";
+pub const FILE_TEMPLATE_OS_MODULE_EXIT: &str = "os_process_modules.h";

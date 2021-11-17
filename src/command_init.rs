@@ -54,17 +54,31 @@ pub fn init_dir(path: PathBuf) {
     );
 
     // Create cmake templates.
-    init_create_file(
-        &path,
-        format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE).as_str(),
-        TEMPLATE_C_MAKE_LIST_TXT.into(),
-    );
+    create_template_file(&path, FILE_TEMPLATE_CMAKE, TEMPLATE_C_MAKE_LIST_TXT);
 
     // Create os templates.
+    create_template_file(&path, FILE_TEMPLATE_OS, TEMPLATE_OS_PROCESS_MODULES_H);
+
+    // Create os add module init templates.
+    create_template_file(
+        &path,
+        FILE_TEMPLATE_OS_MODULE_INIT,
+        TEMPLATE_OS_ADD_MODULE_INIT,
+    );
+
+    // Create os add module exit templates.
+    create_template_file(
+        &path,
+        FILE_TEMPLATE_OS_MODULE_EXIT,
+        TEMPLATE_OS_ADD_MODULE_EXIT,
+    );
+}
+
+fn create_template_file(path: &PathBuf, file_name: &str, contents: &str) {
     init_create_file(
         &path,
-        format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_OS).as_str(),
-        TEMPLATE_OS_PROCESS_MODULES_H.into(),
+        format!("{}/{}", DIR_TEMPLATES, file_name).as_str(),
+        contents.into(),
     );
 }
 
