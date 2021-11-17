@@ -1,11 +1,11 @@
 use std::{
-    fs::{create_dir_all, read_dir, read_to_string, DirEntry},
+    fs::{create_dir_all, read_dir, read_to_string, write, DirEntry},
     path::PathBuf,
 };
 
 use serde::{Deserialize, Serialize};
 
-use crate::{appinput::GenOptions, constants::*};
+use crate::{appinput::GenOptions, constants::*, template_os::TEMPLATE_OS_PROCESS_MODULES_H};
 
 pub fn gen(options: GenOptions) {
     let start_path = options.start_path.unwrap_or("./".into());
@@ -50,7 +50,7 @@ pub fn gen(options: GenOptions) {
     );
 
     // Render add_module_init and add_module_exit strings.
-    let [add_modules_init, add_modules_exit] = [
+    let [add_modules_inits, add_modules_exits] = [
         (templates.os_init, list_init),
         (templates.os_exit, list_exit),
     ]
@@ -71,9 +71,19 @@ pub fn gen(options: GenOptions) {
 
     // Gather data for os template.
     let os_template_data = OSTemplateData {
-        add_modules_init,
-        add_modules_exit,
+        add_modules_inits,
+        add_modules_exits,
     };
+
+    let file_os_process_contents = handlebars_registry
+        .render(templates.os.name, &os_template_data)
+        .expect(format!("Failed to render '{}' with Handlebars.", templates.os.name).as_str());
+
+    let mut path = start_path.clone();
+    path.push(DIR_SRC_MAIN_PRIVATE);
+    create_dir_all(&path).expect(format!("Failed to create '{:?}' directory.", path).as_str());
+    path.push(FILE_OS_PROCESS);
+    write(&path, file_os_process_contents).expect(format!("Failed to write '{:?}'", path).as_str());
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
@@ -241,9 +251,10 @@ struct OSConfig {
 }
 
 // ----- Handlebars -----
+#[derive(Serialize)]
 struct OSTemplateData {
-    add_modules_init: String,
-    add_modules_exit: String,
+    add_modules_inits: String,
+    add_modules_exits: String,
 }
 
 #[derive(Serialize)]
