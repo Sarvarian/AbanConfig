@@ -20,7 +20,9 @@ pub enum AppInput {
     name = "Code Generator",
     about = "Generate CMakeLists.txt and other source files."
 )]
-pub struct GenOptions {}
+pub struct GenOptions {
+    pub start_path: Option<PathBuf>,
+}
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "New Aban Project", about = "Generate new Aban project.")]

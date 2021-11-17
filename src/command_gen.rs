@@ -7,13 +7,11 @@ use serde::Deserialize;
 
 use crate::{appinput::GenOptions, constants::*};
 
-pub fn gen(_options: GenOptions) {
-    // Create cmake directory.
-    let path = PathBuf::from(DIR_CMAKE);
-    create_dir_all(path).expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
+pub fn gen(options: GenOptions) {
+    let start_path = options.start_path.unwrap_or("./".into());
 
     // Gather C modules information.
-    let aban = Aban::new();
+    let aban = Aban::new(start_path.clone());
 
     // Generate C OS Code.
     // For each module, if it has init and/or exit on true, add it to the init and/or exit list.
@@ -38,6 +36,12 @@ pub fn gen(_options: GenOptions) {
         },
     );
 
+    let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_OS));
+    let template = read_to_string(path).;
+
+        // Create cmake directory.
+        create_dir_all(DIR_CMAKE).expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
+
     // Read cmake template file.
     let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE));
     let template =
@@ -51,21 +55,26 @@ struct Aban {
 }
 
 impl Aban {
-    fn new() -> Self {
+    fn new( start_path : PathBuf) -> Self {
+
+        let mut config_path = start_path.clone();
+        config_path.push(FILE_CONFIG_ABAN);
         let config = toml::from_str(
-            &read_to_string(FILE_CONFIG_ABAN)
-                .expect(format!("Failed to read '{}'", FILE_CONFIG_ABAN).as_str()),
+            &read_to_string(config_path)
+                .expect(format!("Failed to read '{:?}'", config_path).as_str()),
         )
         .expect(
             format!(
-                "Failed to deserialize '{}' as an AbanConfig",
-                FILE_CONFIG_ABAN
+                "Failed to deserialize '{:?}' as an AbanConfig",
+                config_path
             )
             .as_str(),
         );
 
-        let modules = read_dir(DIR_SRC_C)
-            .expect(format!("Failed to read '{}'.", DIR_SRC_C).as_str())
+        let mut src_c_path = start_path.clone();
+        src_c_path.push(DIR_SRC_C);
+        let modules = read_dir(src_c_path)
+            .expect(format!("Failed to read '{:?}'.", src_c_path).as_str())
             .fold(Vec::new(), |mut v, r| {
                 if let Ok(dir_entry) = r {
                     if let Some(m) = AbanModule::new_c(dir_entry) {
