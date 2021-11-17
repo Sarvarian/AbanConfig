@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use crate::{appinput::InitOptions, constants::*, template_cmake::*};
+use crate::{appinput::InitOptions, constants::*, template_cmake::*, template_os::*};
 
 pub fn init(_options: InitOptions) {
     init_dir("./".into());
@@ -57,7 +57,14 @@ pub fn init_dir(path: PathBuf) {
     init_create_file(
         &path,
         format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_CMAKE).as_str(),
-        C_MAKE_LIST_TXT_TEMPLATE.into(),
+        TEMPLATE_C_MAKE_LIST_TXT.into(),
+    );
+
+    // Create os templates.
+    init_create_file(
+        &path,
+        format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_OS).as_str(),
+        TEMPLATE_OS_PROCESS_MODULES_H.into(),
     );
 }
 

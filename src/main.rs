@@ -7,6 +7,7 @@ mod command_init;
 mod command_new;
 mod constants;
 mod template_cmake;
+mod template_os;
 
 fn main() {
     let app_in = AppInput::from_args();

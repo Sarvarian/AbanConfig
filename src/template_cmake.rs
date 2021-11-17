@@ -1,4 +1,4 @@
-pub const C_MAKE_LIST_TXT_TEMPLATE: &str = r#"
+pub const TEMPLATE_C_MAKE_LIST_TXT: &str = r#"
 cmake_minimum_required(VERSION 3.10)
 
 project({{name}} VERSION 0.1.0)

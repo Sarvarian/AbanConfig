@@ -4,6 +4,7 @@
         "appinput",
         "cmake",
         "fltk",
+        "ifndef",
         "structopt",
         "tinytemplate"
     ]
