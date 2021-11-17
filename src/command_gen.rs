@@ -14,20 +14,17 @@ pub fn gen(options: GenOptions) {
     let aban = Aban::new(start_path.clone());
 
     // Load templates.
-    let templates_information = load_templates(&start_path);
+    let templates = AbanTemplates::new(&start_path);
 
     // Register templates in an handlebars registry.
     let mut handlebars_registry = handlebars::Handlebars::new();
-    for template_information in templates_information {
+    for template in templates.as_array() {
         handlebars_registry
-            .register_template_string(
-                template_information.name,
-                template_information.template_string,
-            )
+            .register_template_string(template.name, &template.string)
             .expect(
                 format!(
                     "Failed to register '{}' template in an Handlebars registry.",
-                    template_information.name
+                    template.name
                 )
                 .as_str(),
             );
@@ -52,50 +49,82 @@ pub fn gen(options: GenOptions) {
         },
     );
 
-    let string_module_init = {
-        let mut string_module_init = String::new();
-        for module_name in list_init {
-            let data = ModuleTemplateData { module_name };
-            string_module_init += &handlebars_registry
-                .render("os_init", &data)
-                .expect("Failed to render os init template with Handlebars.");
-        }
-        string_module_init
-    };
+    // Render add_module_init and add_module_exit strings.
+    let [add_modules_init, add_modules_exit] = [
+        (templates.os_init, list_init),
+        (templates.os_exit, list_exit),
+    ]
+    .map(|(template, list)| {
+        list.into_iter()
+            .fold(String::new(), |mut res, module_name| {
+                let data = ModuleTemplateData { module_name };
+                res += &handlebars_registry.render(template.name, &data).expect(
+                    format!(
+                        "Failed to render '{}' template with Handlebars.",
+                        template.name,
+                    )
+                    .as_str(),
+                );
+                res
+            })
+    });
 
-    println!("{}", string_module_init);
+    // Gather data for os template.
+    let os_template_data = OSTemplateData {
+        add_modules_init,
+        add_modules_exit,
+    };
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
         .expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
 }
 
-fn load_templates(start_path: &PathBuf) -> Vec<AbanTemplateInformation> {
-    let os = load_template(&start_path, FILE_TEMPLATE_OS);
-    let os_init = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_INIT);
-    let os_exit = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_EXIT);
-    let cmake = load_template(&start_path, FILE_TEMPLATE_CMAKE);
-
-    vec![os, os_init, os_exit, cmake]
+// ----- Aban Templates -----
+struct AbanTemplates<'a> {
+    os: AbanTemplateInformation<'a>,
+    os_init: AbanTemplateInformation<'a>,
+    os_exit: AbanTemplateInformation<'a>,
+    cmake: AbanTemplateInformation<'a>,
 }
 
-fn load_template<'a>(start_path: &PathBuf, file_name: &'a str) -> AbanTemplateInformation<'a> {
-    let mut path = start_path.clone();
-    path.push(DIR_TEMPLATES);
-    path.push(file_name);
-    let template_string =
-        read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str());
+impl<'a> AbanTemplates<'a> {
+    fn as_array(&self) -> [&AbanTemplateInformation<'a>; 4] {
+        [&self.os, &self.os_init, &self.os_exit, &self.cmake]
+    }
 
-    AbanTemplateInformation {
-        name: file_name,
-        template_string,
+    fn new(start_path: &PathBuf) -> Self {
+        let os = Self::load(&start_path, FILE_TEMPLATE_OS);
+        let os_init = Self::load(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_INIT);
+        let os_exit = Self::load(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_EXIT);
+        let cmake = Self::load(&start_path, FILE_TEMPLATE_CMAKE);
+
+        Self {
+            os,
+            os_init,
+            os_exit,
+            cmake,
+        }
+    }
+
+    fn load(start_path: &PathBuf, file_name: &'a str) -> AbanTemplateInformation<'a> {
+        let mut path = start_path.clone();
+        path.push(DIR_TEMPLATES);
+        path.push(file_name);
+        let string =
+            read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str());
+
+        AbanTemplateInformation {
+            name: file_name,
+            string,
+        }
     }
 }
 
 // ----- Aban Template Information -----
 struct AbanTemplateInformation<'a> {
     name: &'a str,
-    template_string: String,
+    string: String,
 }
 
 // ----- Aban -----
@@ -212,7 +241,7 @@ struct OSConfig {
 }
 
 // ----- Handlebars -----
-struct HandlebarsPartOfThisApp {
+struct OSTemplateData {
     add_modules_init: String,
     add_modules_exit: String,
 }

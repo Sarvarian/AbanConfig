@@ -42,5 +42,5 @@ pub const TEMPLATE_OS_ADD_MODULE_INIT: &str = r#"
 "#;
 
 pub const TEMPLATE_OS_ADD_MODULE_EXIT: &str = r#"
-    {{module_name}}_init(argc, argv);
+    {{module_name}}_exit();
 "#;
