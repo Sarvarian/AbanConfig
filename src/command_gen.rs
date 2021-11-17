@@ -154,3 +154,9 @@ struct OSConfig {
     pub init: bool,
     pub exit: bool,
 }
+
+// ----- Handlebars -----
+struct HandlebarsPartOfThisApp {
+    add_modules_init: String,
+    add_modules_exit: String,
+}
