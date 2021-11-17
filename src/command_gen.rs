@@ -35,9 +35,12 @@ pub fn gen(options: GenOptions) {
             (v_init, v_exit)
         },
     );
-
-    let path = PathBuf::from(format!("{}/{}", DIR_TEMPLATES, FILE_TEMPLATE_OS));
-    // let template = read_to_string(path).;
+    let template = {
+        let mut path = start_path.clone();
+        path.push(DIR_TEMPLATES);
+        path.push(FILE_TEMPLATE_OS);
+        read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str())
+    };
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
