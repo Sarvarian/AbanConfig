@@ -76,30 +76,48 @@ pub fn gen(options: GenOptions) {
     };
 
     // Render os_process.h.
-    let file_os_process_contents = handlebars_registry
+    let os_process_contents = handlebars_registry
         .render(templates.os.name, &os_template_data)
         .expect(format!("Failed to render '{}' with Handlebars.", templates.os.name).as_str());
 
-    // Write os_process.h.
-    let mut path = start_path.clone();
-    path.push(DIR_SRC_MAIN_PRIVATE);
-    create_dir_all(&path).expect(format!("Failed to create '{:?}' directory.", path).as_str());
-    path.push(FILE_OS_PROCESS);
-    write(&path, file_os_process_contents).expect(format!("Failed to write '{:?}'", path).as_str());
+    // Write "os_process.h".
+    write_file_in_directory(
+        &start_path,
+        DIR_SRC_MAIN_PRIVATE,
+        FILE_OS_PROCESS,
+        &os_process_contents,
+    );
 
     // Gather data for cmake template.
     let project_name = aban.config.name.as_str();
     let add_main = format!("add_subdirectory(../{0} {0})", DIR_SRC_MAIN);
     let add_modules = "".to_string();
-    CMakeTemplateData {
+    let cmake_template_data = CMakeTemplateData {
         project_name,
         add_main,
         add_modules,
     };
 
-    // Create cmake directory.
-    create_dir_all(DIR_CMAKE)
-        .expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
+    let c_make_lists_txt = handlebars_registry
+        .render(templates.cmake.name, &cmake_template_data)
+        .expect(
+            format!(
+                "Failed to render '{}' with Handlebars.",
+                templates.cmake.name
+            )
+            .as_str(),
+        );
+
+    // write "CMakeLists.txt".
+    write_file_in_directory(&start_path, DIR_CMAKE, FILE_CMAKE, &c_make_lists_txt);
+}
+
+fn write_file_in_directory(start_path: &PathBuf, dir: &str, file: &str, contents: &str) {
+    let mut path = start_path.clone();
+    path.push(dir);
+    create_dir_all(&path).expect(format!("Failed to create '{:?}' directory.", path).as_str());
+    path.push(file);
+    write(&path, contents).expect(format!("Failed to write '{:?}'", path).as_str());
 }
 
 // ----- Aban Templates -----
@@ -274,6 +292,7 @@ struct ModuleTemplateData<'a> {
     module_name: &'a str,
 }
 
+#[derive(Serialize)]
 struct CMakeTemplateData<'a> {
     project_name: &'a str,
     add_main: String,

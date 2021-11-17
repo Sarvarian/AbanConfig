@@ -15,3 +15,4 @@ pub const FILE_TEMPLATE_OS_ADD_MODULE_INIT: &str = "os_add_module_init";
 pub const FILE_TEMPLATE_OS_ADD_MODULE_EXIT: &str = "os_add_module_exit";
 
 pub const FILE_OS_PROCESS: &str = "os_process.h";
+pub const FILE_CMAKE: &str = "CMakeLists.txt";
