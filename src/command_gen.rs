@@ -13,11 +13,27 @@ pub fn gen(options: GenOptions) {
     // Gather C modules information.
     let aban = Aban::new(start_path.clone());
 
-    // Generate C OS Code.
-    // For each module, if it has init and/or exit on true, add it to the init and/or exit list.
-    // So we have two list. init list and exit list.
-    // Check each module for init and exit and add them to the list if it was true.
-    // Then generate code base on init and exit list.
+    // Load templates.
+    let templates_information = load_templates(&start_path);
+
+    // Register templates in an handlebars registry.
+    let mut handlebars_registry = handlebars::Handlebars::new();
+    for template_information in templates_information {
+        handlebars_registry
+            .register_template_string(
+                template_information.name,
+                template_information.template_string,
+            )
+            .expect(
+                format!(
+                    "Failed to register '{}' template in an Handlebars registry.",
+                    template_information.name
+                )
+                .as_str(),
+            );
+    }
+
+    // Store list of modules that requires init and/or exit.
     let (list_init, list_exit) = aban.modules.iter().fold(
         (
             Vec::with_capacity(aban.modules.len()),
@@ -37,38 +53,49 @@ pub fn gen(options: GenOptions) {
     );
 
     let string_module_init = {
-        let template_os_init = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_INIT);
-        let mut hb = handlebars::Handlebars::new();
-        hb.register_template_string("os_init", template_os_init)
-            .expect("Failed to register os init template in Handlebars.");
         let mut string_module_init = String::new();
         for module_name in list_init {
             let data = ModuleTemplateData { module_name };
-            string_module_init += &hb
+            string_module_init += &handlebars_registry
                 .render("os_init", &data)
                 .expect("Failed to render os init template with Handlebars.");
         }
         string_module_init
     };
+
     println!("{}", string_module_init);
-
-    let template_os_exit = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_EXIT);
-
-    let template_os = load_template(&start_path, FILE_TEMPLATE_OS);
-
-    // Read cmake template file.
-    let template_cmake = load_template(&start_path, FILE_TEMPLATE_CMAKE);
 
     // Create cmake directory.
     create_dir_all(DIR_CMAKE)
         .expect(format!("Failed to create '{}' directory.", DIR_CMAKE).as_str());
 }
 
-fn load_template(start_path: &PathBuf, file_name: &str) -> String {
+fn load_templates(start_path: &PathBuf) -> Vec<AbanTemplateInformation> {
+    let os = load_template(&start_path, FILE_TEMPLATE_OS);
+    let os_init = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_INIT);
+    let os_exit = load_template(&start_path, FILE_TEMPLATE_OS_ADD_MODULE_EXIT);
+    let cmake = load_template(&start_path, FILE_TEMPLATE_CMAKE);
+
+    vec![os, os_init, os_exit, cmake]
+}
+
+fn load_template<'a>(start_path: &PathBuf, file_name: &'a str) -> AbanTemplateInformation<'a> {
     let mut path = start_path.clone();
     path.push(DIR_TEMPLATES);
     path.push(file_name);
-    read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str())
+    let template_string =
+        read_to_string(path.clone()).expect(format!("Failed to read '{:?}'", path).as_str());
+
+    AbanTemplateInformation {
+        name: file_name,
+        template_string,
+    }
+}
+
+// ----- Aban Template Information -----
+struct AbanTemplateInformation<'a> {
+    name: &'a str,
+    template_string: String,
 }
 
 // ----- Aban -----
@@ -194,3 +221,8 @@ struct HandlebarsPartOfThisApp {
 struct ModuleTemplateData {
     module_name: String,
 }
+
+// g
+// g
+// G
+// G
