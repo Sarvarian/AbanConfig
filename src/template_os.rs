@@ -7,30 +7,28 @@ pub const TEMPLATE_OS_PROCESS_MODULES_H: &str = r#"
 #ifndef ABAN_OS_PROCESS_H
 #define ABAN_OS_PROCESS_H
 
-static char* os_process_error_module_name[255] = "\0";
+static char os_process_error_module_name[255] = "\0";
 
 int os_init_modules(int argc, char **argv)
 {
     int err = 0;
 
     {{add_modules_inits}}
-    
+
     // Should be 0 for success.
     return err;
 }
 
 void os_exit_modules()
 {
-    
+
     {{add_modules_exits}}
-    
 }
 
-char* get_error_module_name()
+char *get_error_module_name()
 {
     return os_process_error_module_name;
 }
-
 
 #endif // ABAN_OS_PROCESS_H
 "#;
